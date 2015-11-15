@@ -10,27 +10,23 @@ import json
 from scrapy.exceptions import DropItem
 from twisted.enterprise import adbapi
 import hashlib
-#from datetime import datetime
+from twisted.internet import threads 
 
 class AvitoPipeline(object):
     def process_item(self, item, spider):
         return item
-        
+
+
 class GeoPipeline(object):
     def __init__(self):
         #self.geolocator = geopy.geocoders.Nominatim()
-        self.geolocator = geopy.geocoders.Yandex(timeout=2)
-
-    def process_item(self, item, spider):
+        self.geolocator = geopy.geocoders.Yandex(timeout=5)
+        
+    def geocode(self, item): 
         fulladdr = ','.join((item['street'], item['district'], item['city']))
         location = self.geolocator.geocode(fulladdr)
         
-        try:
-            location = self.geolocator.geocode(fulladdr)
-        except geopy.exc.GeocoderTimedOut as e:
-            print("Error: geocode failed with message '%s'"%(e.message))
-            location = self.geolocator.geocode(fulladdr,timeout=10)
-    
+        # call geopy to geocode item code 
         print '======================================================'
         print item['url']
         print "EXTRACTED ADDR", fulladdr.encode('utf-8')
@@ -40,9 +36,44 @@ class GeoPipeline(object):
         print "PECISION",location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision']
         print '======================================================'
         if location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision'] in ['exact','number','near']:
-            item['lon'] = location.longitude
-            item['lat'] = location.latitude
+            #item.lon = location.longitude
+            #item.lat = location.latitude
+            return (location.longitude, location.latitude)
+        else:
+            return None
+
+    def process_item(self, item, spider): 
+        def _onsuccess(geoinfo): 
+            if geoinfo is not None:
+                item['lon'], item['lat'] = geoinfo 
+            return item 
+
+        dfd = threads.deferToThread(self.geocode, item) 
+        dfd.addCallback(_onsuccess) 
+        return dfd
+"""
+class GeoPipeline(object):
+    def __init__(self):
+        #self.geolocator = geopy.geocoders.Nominatim()
+        self.geolocator = geopy.geocoders.Yandex(timeout=5)
+
+    def process_item(self, item, spider):
+        fulladdr = ','.join((item['street'], item['district'], item['city']))
+        location = self.geolocator.geocode(fulladdr)
+        
+        print '======================================================'
+        print item['url']
+        print "EXTRACTED ADDR", fulladdr.encode('utf-8')
+        print "GEOCODED  ADDR", location.address.encode('utf-8')
+        print (location.latitude, location.longitude)
+        print repr(location.raw).decode("unicode-escape").encode('utf-8')
+        print "PECISION",location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision']
+        print '======================================================'
+        if location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision'] in ['exact','number','near']:
+            item.lon = location.longitude
+            item.lat = location.latitude
         return item
+"""
 
 class JsonWriterPipeline(object):
     def __init__(self):

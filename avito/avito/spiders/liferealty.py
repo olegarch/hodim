@@ -53,13 +53,13 @@ class LiferealtySpider(scrapy.Spider):
 
             item['city'] = u'Ростов-на-Дону'
             item['district'] = el.xpath('.//td[@class="price"]/following-sibling::td[@class="mini"]/div/descendant-or-self::*/text()').extract()[0]
-            print item['district'].encode('utf-8')
+            #print item['district'].encode('utf-8')
             item['street'] = ""
             for i in el.xpath(u'.//span[@class="mini" and contains(text(),"Адрес")]/text()').extract():
                 item['street'] = i[7:]
             
             item['m2'] = Decimal(el.xpath('.//td[@class="txt"]/following-sibling::td[@class="aright"][1]/descendant-or-self::*/text()').extract()[0])
-            print item['m2'], str(item['m2']), repr(item['m2'])
+            #print item['m2'], str(item['m2']), repr(item['m2'])
             try:
                 item['restm2'] = Decimal(el.xpath('.//td[@class="txt"]/following-sibling::td[@class="aright"][2]/descendant-or-self::*/text()').extract()[0])
                 item['kitchenm2'] = Decimal(el.xpath('.//td[@class="txt"]/following-sibling::td[@class="aright"][3]/descendant-or-self::*/text()').extract()[0])
