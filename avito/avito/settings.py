@@ -11,7 +11,7 @@
 
 BOT_NAME = 'avito'
 
-LOG_FILE = 'scrapy_avito.log'
+LOG_FILE = 'scrapy.log'
 
 SPIDER_MODULES = ['avito.spiders']
 NEWSPIDER_MODULE = 'avito.spiders'
@@ -89,7 +89,7 @@ AUTOTHROTTLE_DEBUG=True
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-DEPTH_LIMIT = 10000
+DEPTH_LIMIT = 1
 
 DUPEFILTER_DEBUG = True
 

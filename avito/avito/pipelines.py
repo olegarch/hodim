@@ -32,6 +32,7 @@ class GeoPipeline(object):
             location = self.geolocator.geocode(fulladdr,timeout=10)
     
         print '======================================================'
+        print item['url']
         print "EXTRACTED ADDR", fulladdr.encode('utf-8')
         print "GEOCODED  ADDR", location.address.encode('utf-8')
         print (location.latitude, location.longitude)
@@ -85,6 +86,8 @@ class MySQLStorePipeline(object):
         return d
 
     def _do_upsert(self, conn, item, spider):
+        print '_do_upsert'+repr(dict(item)).decode("unicode-escape").encode('utf-8') + "\n"
+        
         """Perform an insert or update."""
         guid = self._get_guid(item)
         #now = datetime.utcnow().replace(microsecond=0).isoformat(' ')
@@ -107,16 +110,17 @@ class MySQLStorePipeline(object):
                 loc = "POINT(%s,%s)" % (item['lon'],item['lat'])
                 print "#### LOC",loc
                 conn.execute("""
-                    INSERT INTO realestate (guid, url, id, title, description, rooms, floor, totfloors, m2, price,  city, district, street, updated, location)
+                    INSERT INTO realestate (guid, url, id, title, description, rooms, floor, totfloors, m2, price, city, district, street, updated, location)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, POINT(%s,%s))
                 """, (guid, item['url'], item['id'], item['title'], item['description'], item['rooms'], 
                       item['floor'], item['totfloors'], item['m2'], item['price'], 
                       item['city'], item['district'], item['street'], item['updated'],
                       item['lon'],item['lat']))
+                    
             else:
                 loc = 'NULL'
                 conn.execute("""
-                    INSERT INTO realestate (guid, url, id, title, description, rooms, floor, totfloors, m2, price,  city, district, street, updated)
+                    INSERT INTO realestate (guid, url, id, title, description, rooms, floor, totfloors, m2, price, city, district, street, updated)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (guid, item['url'], item['id'], item['title'], item['description'], item['rooms'], 
                       item['floor'], item['totfloors'], item['m2'], item['price'], 

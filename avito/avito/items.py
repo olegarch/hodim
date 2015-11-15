@@ -8,7 +8,7 @@
 import scrapy
 
 
-class AvitoItem(scrapy.Item):
+class ApartmentItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     id = scrapy.Field()
@@ -17,6 +17,8 @@ class AvitoItem(scrapy.Item):
     description = scrapy.Field()
     rooms = scrapy.Field()
     m2 = scrapy.Field()
+    kitchenm2 = scrapy.Field()
+    restm2 = scrapy.Field()
     floor = scrapy.Field()
     totfloors = scrapy.Field()
     price = scrapy.Field()

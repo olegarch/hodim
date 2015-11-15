@@ -6,10 +6,10 @@ CREATE TABLE realestate (
   title TEXT,
   description TEXT,
 
-  rooms TEXT,
+  rooms INT,
   floor TINYINT UNSIGNED,
   totfloors TINYINT UNSIGNED,
-  m2 FLOAT,
+  m2 DECIMAL(5,2),
 
   price DECIMAL(10),
 

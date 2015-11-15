@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
-import re
 import scrapy
-
+from avito.items import ApartmentItem
+import re
 from datetime import datetime
+from decimal import *
 
-from avito.items import AvitoItem
 
 class AvitoSpider(scrapy.Spider):
     name = "avito"
     allowed_domains = ["avito.ru"]
     start_urls = [
-        "https://www.avito.ru/rostov-na-donu/kvartiry/prodam?p=2",
+        "https://www.avito.ru/rostov-na-donu/kvartiry/prodam",
     ]
 
     def parse(self, response):
@@ -52,10 +52,10 @@ class AvitoSpider(scrapy.Spider):
         
         if m is not None:
             if m.group(1) is not None:
-                rooms = m.group(1)
+                rooms = int(m.group(1))
             else:
-                rooms = m.group(2)
-            m2 = int(m.group(3))
+                rooms = 0
+            m2 = Decimal(m.group(3))
             floor = int(m.group(4))
             totfloors = int(m.group(5))
         
@@ -85,7 +85,7 @@ class AvitoSpider(scrapy.Spider):
         print 'ID:','avito'+id[0].encode('utf-8')
         print '------------------------------------------------------'
         
-        item = AvitoItem()
+        item = ApartmentItem()
         item['title'] = title[0]
         item['url'] = response.url
         item['street'] = street
