@@ -28,4 +28,11 @@ class ApartmentItem(scrapy.Item):
     updated = scrapy.Field()
     lat = scrapy.Field()
     lon = scrapy.Field()
+    
+    wc = scrapy.Field() # watercloset
+    walls = scrapy.Field()
+    ceilings = scrapy.Field()
+    rennovation = scrapy.Field()
+    builtDate = scrapy.Field()
+    postDate = scrapy.Field()
 
