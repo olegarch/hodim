@@ -13,11 +13,36 @@ from sklearn import gaussian_process
 from sklearn import svm
 from sklearn.cross_validation import train_test_split, cross_val_score, cross_val_predict, ShuffleSplit
 from sklearn.pipeline import make_pipeline
-from sklearn.learning_curve import learning_curve
+from sklearn.learning_curve import learning_curve, validation_curve
 from sklearn import gaussian_process
 
+def plot_validation_curve(estimator, title, X, y, ylim=None, cv=3, param_name="gamma",
+                        param_range=np.linspace(1, 6, 5), scoring=None, n_jobs=1):
+    train_scores, test_scores = validation_curve(estimator, X, y, param_name=param_name, param_range=param_range, cv=cv, scoring=scoring, n_jobs=n_jobs)
+    train_scores_mean = np.mean(train_scores, axis=1)
+    train_scores_std = np.std(train_scores, axis=1)
+    test_scores_mean = np.mean(test_scores, axis=1)
+    test_scores_std = np.std(test_scores, axis=1)
+    print train_scores, test_scores
+
+    plt.title("Validation Curve")
+    plt.xlabel(param_name)
+    plt.ylabel("Score")
+    #plt.ylim(0.0, 1.1)
+    #plt.semilogx(param_range, train_scores_mean, label="Training score", color="r")
+    plt.plot(param_range, train_scores_mean, 'o-', label="Training score",  color="r")
+    plt.fill_between(param_range, train_scores_mean - train_scores_std,
+                     train_scores_mean + train_scores_std, alpha=0.2, color="r")
+    plt.plot(param_range, test_scores_mean, 'o-', label="Cross-validation score", color="g")
+    #plt.semilogx(param_range, test_scores_mean, label="Cross-validation score", color="g")
+    plt.fill_between(param_range, test_scores_mean - test_scores_std,
+                     test_scores_mean + test_scores_std, alpha=0.2, color="g")
+    plt.legend(loc="best")
+    plt.show()
+                        
+                        
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
-                        n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
+                        n_jobs=1, train_sizes=np.linspace(.1, 1.0, 8)):
     """
     Generate a simple plot of the test and traning learning curve.
 
@@ -103,37 +128,41 @@ def main():
     print X.shape
     #exit(0)
     y = data[:,-1]
-    #X = preprocessing.scale(X)
+    X = preprocessing.scale(X)
+    
     #regr_2 = AdaBoostRegressor(DecisionTreeRegressor(max_depth=4),
     #                          n_estimators=300, random_state=rng)
-    rng = np.random.RandomState(41)
+    rng = np.random.RandomState(45)
+    #rng = np.random.RandomState()
 
     regressions = [
         #("GaussianProcess(regr='constant',corr='cubic')",gaussian_process.GaussianProcess(regr='constant',corr='cubic', theta0=1e-2, thetaL=1e-4, thetaU=1e-1,random_start=100)),
         #("GaussianProcess(regr='constant',corr='squared_exponential')",gaussian_process.GaussianProcess(regr='constant',corr='squared_exponential', theta0=1e-1, thetaL=1e-3, thetaU=1,random_start=100)),
-        ("LinearSVR",svm.LinearSVR()),
+        #("LinearSVR",svm.LinearSVR()),
         #("SVR",svm.SVR()),
-        ("SVR(kernel='linear')",svm.SVR(kernel='linear')),
-        ("SVR(C=10.0, kernel='linear')",svm.SVR(C=10.0,kernel='linear')),
+        #("SVR(kernel='linear')",svm.SVR(kernel='linear')),
+        #("SVR(C=10.0, kernel='linear')",svm.SVR(C=10.0,kernel='linear')),
+        #("SVR(C=10.0, kernel='poly')",svm.SVR(C=10.0,kernel='linear')),
+        #("SVR(C=5.0, kernel='linear')",svm.SVR(C=5.0,kernel='linear')),
+        #("SVR(C=5.0, kernel='rbf')",svm.SVR(C=5.0,kernel='rbf')),
         #("SVR(C=1.0, epsilon=0.2)",svm.SVR(C=1.0, epsilon=0.2)),
         #("SVR(C=1.0, epsilon=0.4)",svm.SVR(C=1.0, epsilon=0.4)),
         #("SVR(kernel='rbf', gamma=0.7)",svm.SVR(kernel='rbf', gamma=0.7)),
         #("NuSVR",svm.NuSVR()),
         #("GradientBoostingRegressor",ensemble.GradientBoostingRegressor()),
         #("KNeighborsRegressor(k=2,weights='uniform')", neighbors.KNeighborsRegressor(n_neighbors=2, weights='uniform')),
-        #("KNeighborsRegressor(k=5,weights='uniform')", neighbors.KNeighborsRegressor(n_neighbors=5, weights='uniform')),
+        ("KNeighborsRegressor(k=5,weights='uniform')", neighbors.KNeighborsRegressor(n_neighbors=5, weights='uniform')),
         #("KNeighborsRegressor(k=10,weights='uniform')", neighbors.KNeighborsRegressor(n_neighbors=10, weights='uniform')),
         #("KNeighborsRegressor(k=5,weights='distance')", neighbors.KNeighborsRegressor(n_neighbors=5, weights='distance')),
         #("Tree", tree.DecisionTreeRegressor()),
         #("RFTree", ensemble.RandomForestRegressor(n_estimators=100, random_state=rng)),
         #("AdaBoostTree", ensemble.AdaBoostRegressor(tree.DecisionTreeRegressor(), n_estimators=300, random_state=rng)),
-        ("OLS", linear_model.LinearRegression()),
-        #("Ridge8", linear_model.Ridge(alpha=.99)),
+        #("OLS", linear_model.LinearRegression()),
+        #("Ridge99", linear_model.Ridge(alpha=.99)),
         #("Ridge1", linear_model.Ridge(alpha=.1)),
         #("Lasso", linear_model.Lasso(alpha = 0.1)),
         #("ScaledOLS", make_pipeline(preprocessing.StandardScaler(), linear_model.LinearRegression()))
     ]
-
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.01, random_state = rng)
     X_test_sorted = X_test[X_test[:,-1].argsort()]
@@ -141,15 +170,25 @@ def main():
     #print X_train.shape
     #print X_test.shape
 
-    estimator = linear_model.LinearRegression()
-    #plot_learning_curve(regressions[0][1], regressions[0][0], X, y, ylim=(0.7, 1.01), cv=cv, n_jobs=4)
     for name, model_raw in regressions:
-        cv = ShuffleSplit(X.shape[0], n_iter=5, test_size=0.2, random_state=0)
+        cv = ShuffleSplit(X.shape[0], n_iter=3, test_size=0.2, random_state=rng)
+        model = model_raw #make_pipeline(preprocessing.StandardScaler(), model_raw)
+        plot_validation_curve(model, name, X, y, cv=3, n_jobs=8, param_name="n_neighbors", param_range=np.linspace(1, 11, 10, dtype='i4'))
+
+    plt.show()
+    exit(0)
+
+    
+    for name, model_raw in regressions:
+        cv = ShuffleSplit(X.shape[0], n_iter=3, test_size=0.2, random_state=rng)
         model = make_pipeline(preprocessing.StandardScaler(), model_raw)
         #model = make_pipeline(preprocessing.MinMaxScaler(), model_raw)
         #model = make_pipeline(preprocessing.RobustScaler(), model_raw)
         #plot_learning_curve(model, name, X, y, ylim=(0, 1.01), cv=cv, n_jobs=7)
         plot_learning_curve(model, name, X, y, cv=cv, n_jobs=8)
+        #plot_validation_curve(model, name, X, y, cv=3, n_jobs=8)
+        
+        
     plt.show()
     exit(0)
 
