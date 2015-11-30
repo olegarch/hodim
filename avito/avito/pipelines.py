@@ -16,13 +16,23 @@ class AvitoPipeline(object):
     def process_item(self, item, spider):
         return item
 
+class PrintPipeline(object):
+    def process_item(self, item, spider):
+        #print " ==== PrintPipeline ===="
+        spider.logger.info(" ==== PrintPipeline ====")
+        for name,val in item.items():
+            #print name,':',val.encode('utf-8') if isinstance(val, unicode) else val
+            #spider.logger.info('%s:%s',name,val.encode('utf-8') if isinstance(val, unicode) else val)
+            spider.logger.info('%s:%s',name,val)
+        spider.logger.info(" ==== PrintPipeline ====")
+        return item        
 
 class GeoPipeline(object):
     def __init__(self):
         #self.geolocator = geopy.geocoders.Nominatim()
         self.geolocator = geopy.geocoders.Yandex(timeout=5)
         
-    def geocode(self, item): 
+    def geocode(self, item, logger): 
         fulladdr = ','.join((item['street'], item['district'], item['city']))
         location = self.geolocator.geocode(fulladdr)
         
@@ -48,7 +58,7 @@ class GeoPipeline(object):
                 item['lon'], item['lat'] = geoinfo 
             return item 
 
-        dfd = threads.deferToThread(self.geocode, item) 
+        dfd = threads.deferToThread(self.geocode, item, spider.logger) 
         dfd.addCallback(_onsuccess) 
         return dfd
 """
@@ -135,38 +145,20 @@ class MySQLStorePipeline(object):
                 # SET name=%s, description=%s, url=%s, updated=%s
                 # WHERE guid=%s
             # """, (item['name'], item['description'], item['url'], now, guid))
-            print("Item updated in db: %s %r" % (guid, item))
+            print("Item updated in db: %s" % (guid))
         else:
-            if 'lat' in item:
-                loc = "POINT(%s,%s)" % (item['lon'],item['lat'])
-                print "#### LOC",loc
-                conn.execute("""
-                    INSERT INTO realestate (guid, url, id, title, description, rooms, floor, totfloors, m2, price, city, district, street, updated, location)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, POINT(%s,%s))
-                """, (guid, item['url'], item['id'], item['title'], item['description'], item['rooms'], 
-                      item['floor'], item['totfloors'], item['m2'], item['price'], 
-                      item['city'], item['district'], item['street'], item['updated'],
-                      item['lon'],item['lat']))
-                    
-            else:
-                loc = 'NULL'
-                conn.execute("""
-                    INSERT INTO realestate (guid, url, id, title, description, rooms, floor, totfloors, m2, price, city, district, street, updated)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (guid, item['url'], item['id'], item['title'], item['description'], item['rooms'], 
-                      item['floor'], item['totfloors'], item['m2'], item['price'], 
-                      item['city'], item['district'], item['street'], item['updated']
-                      ))
-                
-            # conn.execute("""
-                # INSERT INTO realestate (guid, url, id, title, description, rooms, floor, totfloors, m2, price,  city, district, street, updated, location)
-                # VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            # """, (guid, item['url'], item['id'], item['title'], item['description'], item['rooms'], 
-                  # item['floor'], item['totfloors'], item['m2'], item['price'], 
-                  # item['city'], item['district'], item['street'], item['updated'],
-                  # loc))
- 
-            print("Item stored in db: %s %r" % (guid, item))
+            loc = "POINT(%s,%s)" % (item['lon'],item['lat']) if 'lat' in item else None
+            conn.execute("""
+                INSERT INTO realestate (guid, url, id, title, description, rooms, floor, totfloors, m2, kitchenm2, restm2, price, city, district, street, updated, location)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (guid, item['url'], item['id'], item['title'], item['description'], item['rooms'], 
+                  item['floor'], item['totfloors'], 
+                  item['m2'], item.get('kitchenm2',None), item.get('restm2',None),
+                  item['price'], 
+                  item['city'], item['district'], item['street'], item['updated'], loc
+                  ))
+
+            print("Item stored in db: %s" % (guid))
 
     def _handle_error(self, failure, item, spider):
         """Handle occurred on db interaction."""
