@@ -9,7 +9,10 @@ CREATE TABLE realestate (
   rooms INT,
   floor TINYINT UNSIGNED,
   totfloors TINYINT UNSIGNED,
+  
   m2 DECIMAL(5,2),
+  kitchenm2 DECIMAL(5,2),
+  restm2 DECIMAL(5,2),
 
   price DECIMAL(10),
 
