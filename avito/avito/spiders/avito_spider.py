@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 
 import scrapy
-from avito.items import ApartmentItem
+from avito.items import Apartment
 import re
 from datetime import datetime
 from decimal import *
@@ -77,7 +77,7 @@ class AvitoSpider(scrapy.Spider):
         #print 'ID:','avito'+id[0].encode('utf-8')
         #print '------------------------------------------------------'
         
-        item = ApartmentItem()
+        item = Apartment()
         item['title'] = title[0]
         item['url'] = response.url
         item['street'] = street
@@ -89,7 +89,7 @@ class AvitoSpider(scrapy.Spider):
         item['m2'] = m2
         item['rooms'] = rooms
         item['price'] = price
-        item['id'] = 'avito'+id[0]
+        #item['id'] = 'avito'+id[0]
         item['updated'] = datetime.utcnow().isoformat()
 
         yield item

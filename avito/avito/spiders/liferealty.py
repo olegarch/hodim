@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 
 import scrapy
-from avito.items import ApartmentItem
+from avito.items import Apartment
 import re
 from datetime import datetime
 from decimal import *
@@ -26,8 +26,8 @@ class LiferealtySpider(scrapy.Spider):
             
         for el in response.xpath('//table[@class="list townlist"]//tr[@offerid and not(@over50)]'):
 
-            item = ApartmentItem()
-            item['id'] = 'liferealty' + el.xpath('@offerid').extract()[0]
+            item = Apartment()
+            #item['id'] = 'liferealty' + el.xpath('@offerid').extract()[0]
             item['url'] = el.xpath('@offerhref').extract()[0]
                         
             print item['url']

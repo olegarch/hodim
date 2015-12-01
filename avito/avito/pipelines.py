@@ -149,9 +149,9 @@ class MySQLStorePipeline(object):
         else:
             loc = "POINT(%s,%s)" % (item['lon'],item['lat']) if 'lat' in item else None
             conn.execute("""
-                INSERT INTO realestate (guid, url, id, title, description, rooms, floor, totfloors, m2, kitchenm2, restm2, price, city, district, street, updated, location)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (guid, item['url'], item['id'], item['title'], item['description'], item['rooms'], 
+                INSERT INTO realestate (guid, url, title, description, rooms, floor, totfloors, m2, kitchenm2, restm2, price, city, district, street, updated, location)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (guid, item['url'],  item['title'], item['description'], item['rooms'], 
                   item['floor'], item['totfloors'], 
                   item['m2'], item.get('kitchenm2',None), item.get('restm2',None),
                   item['price'], 

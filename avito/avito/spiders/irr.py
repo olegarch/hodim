@@ -13,9 +13,7 @@ def containingClass(className):
 class IrrSpider(scrapy.Spider):
     name = "irr"
     allowed_domains = ["irr.ru"]
-    start_urls = [
-        "http://rostovnadonu.irr.ru/real-estate/apartments-sale/",
-    ]
+    start_urls = [ "http://rostovnadonu.irr.ru/real-estate/apartments-sale/" ]
     custom_settings = {
         'COOKIES_ENABLED': True
     }    
@@ -46,11 +44,7 @@ class IrrSpider(scrapy.Spider):
             f.write(response.body)
     
         l = ApartmentLoader(Apartment(), response)
-        #l.add_xpath('name', xpath1) # (1)
-        #l.add_xpath('name', xpath2) # (2)
-        #l.add_css('name', css) # (3)
         l.add_value('url', response.url)
-        l.add_xpath('id', 'concat("irr",//inputa[@type="hidden" and @class="js-advertId"]/@value)')
         l.add_xpath('description', '//div[@class="advertDescriptionText"]/text()')
         l.add_xpath('street', '//i[contains(@class,"irri-map")]/following-sibling::span/text()')
         l.add_xpath('street', '//i[contains(@class,"icon_spot")]/following-sibling::div/text()')

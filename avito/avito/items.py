@@ -29,7 +29,6 @@ def remove_lines(value):
     return sub('[\n]', '', value)
 
 class Apartment(Item):
-    id = Field()
     title = Field()
     url = Field()
     description = Field()
