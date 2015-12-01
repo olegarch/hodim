@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 
 import scrapy
-from avito.items import ApartmentItem
+from avito.items import Apartment, ApartmentLoader
 import re
 from datetime import datetime
 from decimal import *
@@ -34,53 +34,46 @@ class IrrSpider(scrapy.Spider):
         next_url = response.urljoin(next_page_href)
         self.logger.info('crawling next %s',next_url)
         yield scrapy.Request(next_url, callback=self.parse)
-    
-    def extract_property(self, response, propertyName):
-        propertyVal = response.xpath(u'//div[@class="propertyName" and contains(text(),"'+propertyName+'")]/following-sibling::div[@class="propertyValue"]/descendant-or-self::*/text()').extract()
-        self.logger.info('property %s %s', propertyName, propertyVal)
-        return propertyVal[0].strip()
+            
+    def extract_property_string(self, propertyName):
+        return u'//div[@class="propertyName" and contains(text(),"'+propertyName+'")]/following-sibling::div[@class="propertyValue"]/descendant-or-self::*/text()'
             
     def parse_item_page(self, response):
-        item = ApartmentItem()
-        
+
         filename = response.url[-10:] + '.html'
         self.logger.info('filename %s',filename)
         with open(filename, 'wb') as f:
             f.write(response.body)
+    
+        l = ApartmentLoader(Apartment(), response)
+        #l.add_xpath('name', xpath1) # (1)
+        #l.add_xpath('name', xpath2) # (2)
+        #l.add_css('name', css) # (3)
+        l.add_value('url', response.url)
+        l.add_xpath('id', 'concat("irr",//inputa[@type="hidden" and @class="js-advertId"]/@value)')
+        l.add_xpath('description', '//div[@class="advertDescriptionText"]/text()')
+        l.add_xpath('street', '//i[contains(@class,"irri-map")]/following-sibling::span/text()')
+        l.add_xpath('street', '//i[contains(@class,"icon_spot")]/following-sibling::div/text()')
+        l.add_xpath('price', '//div[contains(@class,"productPagePrice")]/text()')
+        l.add_value('city', u'Ростов-на-Дону')
+        l.add_value('updated', datetime.utcnow().isoformat())
 
-        self.logger.info('===================================================================')
-        item['url'] = response.url
-        self.logger.info('URL %s',item['url'])
-        s = response.xpath('//i[contains(@class,"irri-map")]/following-sibling::span/text()').extract()
-        if len(s)==0:
-            s = response.xpath('//i[contains(@class,"icon_spot")]/following-sibling::div/text()').extract()
-            
-        #item['id'] ='irr'+ response.xpath('//inputa[@type="hidden" and @class="js-advertId"]/@value').extract()[0]
-        item['street'] = ' '.join(s)
-        item['floor'] = int(self.extract_property(response,u"Этаж:"))
-        item['totfloors'] = int(self.extract_property(response,u"Этажей в здании:"))
-        #item['kitchenm2'] = Decimal( self.extract_property(response,u"Площадь кухни:").split()[0] )
-        item['restm2'] = Decimal( self.extract_property(response,u"Жилая площадь:").split()[0] )
-        #item['wc'] = self.extract_property(response,u"Санузел:")
-        #item['walls'] = self.extract_property(response,u"Материал стен:")
-        #item['ceilings'] = self.extract_property(response,u"Высота потолков:")
-        item['rooms'] = int(self.extract_property(response,u"Комнат в квартире:"))
-        item['m2'] = Decimal( self.extract_property(response,u"Общая площадь:").split()[0] )
-        #item['district'] = self.extract_property(response,u"Район города:")
-        #item['rennovation'] = self.extract_property(response,u"Ремонт:")
-        #item['builtDate'] = self.extract_property(response,u"Год постройки:")
-        #item['water'] = self.extract_property(response,u"Система водоснабжения:")
-        #item['heating'] = self.extract_property(response,u"Система отопления:")
-        item['description'] = ' '.join([t.strip() for t in response.xpath('//div[@class="advertDescriptionText"]/text()').extract()])
-        item['updated'] = datetime.utcnow().isoformat()
-        self.logger.info('===================================================================')
+        # properties
+        l.add_xpath('m2', self.extract_property_string(u"Общая площадь:"))
+        l.add_xpath('kitchenm2', self.extract_property_string(u"Площадь кухни:"))
+        l.add_xpath('restm2', self.extract_property_string(u"Жилая площадь:"))
         
-        #yield item
-        return 
+        l.add_xpath('floor', self.extract_property_string(u"Этаж:"))
+        l.add_xpath('totfloors', self.extract_property_string(u"Этажей в здании:"))
+        l.add_xpath('rooms', self.extract_property_string(u"Комнат в квартире:"))
         
-        item['title'] = title[0]
-        item['district'] = district
-        item['city'] = city
-        item['price'] = price
-
-        yield item
+        l.add_xpath('district', self.extract_property_string(u"Район города:"))
+        l.add_xpath('rennovation', self.extract_property_string(u"Ремонт:"))
+        l.add_xpath('builtDate', self.extract_property_string(u"Год постройки:"))
+        l.add_xpath('water', self.extract_property_string(u"Система водоснабжения:"))
+        l.add_xpath('heating', self.extract_property_string(u"Система отопления:"))
+        l.add_xpath('wc', self.extract_property_string(u"Санузел:"))
+        l.add_xpath('walls', self.extract_property_string(u"Материал стен:"))
+        l.add_xpath('ceilings', self.extract_property_string(u"Высота потолков:"))
+        l.add_xpath('balcony', self.extract_property_string(u"Балкон"))
+        yield l.load_item()
