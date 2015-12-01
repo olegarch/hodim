@@ -33,7 +33,8 @@ class GeoPipeline(object):
         self.geolocator = geopy.geocoders.Yandex(timeout=5)
         
     def geocode(self, item, logger): 
-        fulladdr = ','.join((item['street'], item.get('district',''), item.get('city','')))
+        #fulladdr = ','.join((item['street'], item.get('district',''), item.get('city','')))
+        fulladdr = ','.join((item['street'], item.get('city','')))
         location = self.geolocator.geocode(fulladdr)
         
         # call geopy to geocode item code 
@@ -148,9 +149,10 @@ class MySQLStorePipeline(object):
             print("Item updated in db: %s" % (guid))
         else:
             loc = "POINT(%s,%s)" % (item['lon'],item['lat']) if 'lat' in item else None
+            print "LOCATION",loc
             conn.execute("""
                 INSERT INTO realestate (guid, url, description, rooms, floor, totfloors, m2, kitchenm2, restm2, price, city, district, street, updated, location)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, POINT(%s, %s))
             """, (guid, 
                   item['url'], 
                   item['description'], 
@@ -160,20 +162,22 @@ class MySQLStorePipeline(object):
                   item['m2'], 
                   item.get('kitchenm2',None), 
                   item.get('restm2',None),
-                  item['price'], 
-                  item['city'], 
+                  item['price'],
+                  item.get('city',None), 
                   item.get('district',None), 
                   item['street'], 
                   item['updated'], 
-                  loc
+                  item.get('lon',None),
+                  item.get('lat',None)
                   ))
 
             print("Item stored in db: %s" % (guid))
 
     def _handle_error(self, failure, item, spider):
         """Handle occurred on db interaction."""
-        # do nothing, just log
-        print(failure)
+        # do nothing, just log  
+        print 'fail',failure
+        raise
 
     def _get_guid(self, item):
         """Generates an unique identifier for a given item."""
