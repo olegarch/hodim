@@ -19,12 +19,12 @@ class AvitoPipeline(object):
 class PrintPipeline(object):
     def process_item(self, item, spider):
         #print " ==== PrintPipeline ===="
-        spider.logger.info(" ==== PrintPipeline ====")
+        spider.logger.debug("==== PrintPipeline ====")
         for name,val in item.items():
             #print name,':',val.encode('utf-8') if isinstance(val, unicode) else val
-            #spider.logger.info('%s:%s',name,val.encode('utf-8') if isinstance(val, unicode) else val)
-            spider.logger.info('%s:%s',name,val)
-        spider.logger.info(" ==== PrintPipeline ====")
+            #spider.logger.debug('%s:%s',name,val.encode('utf-8') if isinstance(val, unicode) else val)
+            spider.logger.debug("%s%s:%s",name,type(val),val)
+        spider.logger.debug("==== PrintPipeline ====")
         return item        
 
 class GeoPipeline(object):
@@ -37,14 +37,14 @@ class GeoPipeline(object):
         location = self.geolocator.geocode(fulladdr)
         
         # call geopy to geocode item code 
-        print '======================================================'
-        print item['url']
+        logger.debug('==== GeoPipeline ====')
+        logger.debug('URL %s',item['url'])
         print "EXTRACTED ADDR", fulladdr.encode('utf-8')
         print "GEOCODED  ADDR", location.address.encode('utf-8')
         print (location.latitude, location.longitude)
         print repr(location.raw).decode("unicode-escape").encode('utf-8')
         print "PECISION",location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision']
-        print '======================================================'
+        logger.debug('==== GeoPipeline ====')
         if location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision'] in ['exact','number','near']:
             #item.lon = location.longitude
             #item.lat = location.latitude
