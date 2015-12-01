@@ -2,7 +2,6 @@ DROP TABLE IF EXISTS realestate;
 CREATE TABLE realestate (
   guid CHAR(32) PRIMARY KEY,
   url TEXT,
-  title TEXT,
   description TEXT,
 
   rooms INT,
