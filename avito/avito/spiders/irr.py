@@ -49,7 +49,7 @@ class IrrSpider(scrapy.Spider):
         l.add_xpath('street', '//i[contains(@class,"irri-map")]/following-sibling::span/text()')
         l.add_xpath('street', '//i[contains(@class,"icon_spot")]/following-sibling::div/text()')
         l.add_xpath('price', '//div[contains(@class,"productPagePrice")]/text()')
-        l.add_value('city', u'Ростов-на-Дону')
+        #l.add_value('city', u'Ростов-на-Дону')
         l.add_value('updated', datetime.utcnow().isoformat())
 
         # properties

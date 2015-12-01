@@ -33,7 +33,7 @@ class GeoPipeline(object):
         self.geolocator = geopy.geocoders.Yandex(timeout=5)
         
     def geocode(self, item, logger): 
-        fulladdr = ','.join((item['street'], item['district'], item['city']))
+        fulladdr = ','.join((item['street'], item.get('district',''), item.get('city','')))
         location = self.geolocator.geocode(fulladdr)
         
         # call geopy to geocode item code 
@@ -162,7 +162,7 @@ class MySQLStorePipeline(object):
                   item.get('restm2',None),
                   item['price'], 
                   item['city'], 
-                  item['district'], 
+                  item.get('district',None), 
                   item['street'], 
                   item['updated'], 
                   loc
