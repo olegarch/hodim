@@ -45,7 +45,8 @@ class IrrSpider(scrapy.Spider):
     
         l = ApartmentLoader(Apartment(), response)
         l.add_value('url', response.url)
-        l.add_xpath('description', '//div[@class="advertDescriptionText"]/text()')
+        #l.add_xpath('description', '//div[@class="advertDescriptionText"]/text()')
+        l.add_xpath('description', '//meta[@name="description"]/@content')
         l.add_xpath('street', '//i[contains(@class,"irri-map")]/following-sibling::span/text()')
         l.add_xpath('street', '//i[contains(@class,"icon_spot")]/following-sibling::div/text()')
         l.add_xpath('price', '//div[contains(@class,"productPagePrice")]/text()')
