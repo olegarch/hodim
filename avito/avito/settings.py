@@ -11,7 +11,8 @@
 
 BOT_NAME = 'avito'
 
-LOG_FILE = 'scrapy.log'
+#LOG_FILE = 'scrapy.log'
+LOG_STDOUT = True
 
 SPIDER_MODULES = ['avito.spiders']
 NEWSPIDER_MODULE = 'avito.spiders'
@@ -20,7 +21,8 @@ NEWSPIDER_MODULE = 'avito.spiders'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS=32
+CONCURRENT_REQUESTS=1
+#CONCURRENT_REQUESTS=32
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
@@ -66,8 +68,9 @@ COOKIES_ENABLED=False
 ITEM_PIPELINES = {
     #'avito.pipelines.SomePipeline': 300,
     'avito.pipelines.GeoPipeline': 301,
+    'avito.pipelines.PrintPipeline': 997,
     'avito.pipelines.MySQLStorePipeline': 998,
-    'avito.pipelines.JsonWriterPipeline': 999
+    #'avito.pipelines.JsonWriterPipeline': 999
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -89,7 +92,7 @@ AUTOTHROTTLE_DEBUG=True
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-DEPTH_LIMIT = 100000
+DEPTH_LIMIT = 1
 
 DUPEFILTER_DEBUG = True
 
