@@ -19,5 +19,16 @@ CREATE TABLE realestate (
   district TEXT,
   street TEXT,
   
+  wc TEXT,
+  walls TEXT,
+  ceilings DECIMAL(5,2),
+  rennovation TEXT,
+  builtdate YEAR,
+  heating TEXT,
+  water TEXT,
+  balcony TEXT,
+  security TEXT,
+  
+  postDate DATETIME,
   updated DATETIME
 ) DEFAULT CHARSET=utf8;
