@@ -44,7 +44,7 @@ class GeoPipeline(object):
         print "GEOCODED  ADDR", location.address.encode('utf-8')
         print (location.latitude, location.longitude)
         print repr(location.raw).decode("unicode-escape").encode('utf-8')
-        print "PECISION",location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision']
+        print "PRECISION",location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision']
         logger.debug('==== GeoPipeline ====')
         if location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision'] in ['exact','number','near']:
             #item.lon = location.longitude
@@ -62,29 +62,6 @@ class GeoPipeline(object):
         dfd = threads.deferToThread(self.geocode, item, spider.logger) 
         dfd.addCallback(_onsuccess) 
         return dfd
-"""
-class GeoPipeline(object):
-    def __init__(self):
-        #self.geolocator = geopy.geocoders.Nominatim()
-        self.geolocator = geopy.geocoders.Yandex(timeout=5)
-
-    def process_item(self, item, spider):
-        fulladdr = ','.join((item['street'], item['district'], item['city']))
-        location = self.geolocator.geocode(fulladdr)
-        
-        print '======================================================'
-        print item['url']
-        print "EXTRACTED ADDR", fulladdr.encode('utf-8')
-        print "GEOCODED  ADDR", location.address.encode('utf-8')
-        print (location.latitude, location.longitude)
-        print repr(location.raw).decode("unicode-escape").encode('utf-8')
-        print "PECISION",location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision']
-        print '======================================================'
-        if location.raw[u'metaDataProperty'][u'GeocoderMetaData'][u'precision'] in ['exact','number','near']:
-            item.lon = location.longitude
-            item.lat = location.latitude
-        return item
-"""
 
 class JsonWriterPipeline(object):
     def __init__(self):
@@ -140,7 +117,6 @@ class MySQLStorePipeline(object):
         ret = conn.fetchone()[0]
 
         if ret:
-            pass
             # conn.execute("""
                 # UPDATE realestate
                 # SET name=%s, description=%s, url=%s, updated=%s
@@ -150,26 +126,39 @@ class MySQLStorePipeline(object):
         else:
             loc = "POINT(%s,%s)" % (item['lon'],item['lat']) if 'lat' in item else None
             print "LOCATION",loc
-            conn.execute("""
-                INSERT INTO realestate (guid, url, description, rooms, floor, totfloors, m2, kitchenm2, restm2, price, city, district, street, updated, location)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, POINT(%s, %s))
-            """, (guid, 
-                  item['url'], 
-                  item['description'], 
-                  item['rooms'], 
-                  item['floor'], 
-                  item['totfloors'], 
-                  item['m2'], 
-                  item.get('kitchenm2',None), 
-                  item.get('restm2',None),
-                  item['price'],
-                  item.get('city',None), 
-                  item.get('district',None), 
-                  item['street'], 
-                  item['updated'], 
-                  item.get('lon',None),
-                  item.get('lat',None)
-                  ))
+            conn.execute("""INSERT INTO realestate 
+                (guid, url, description, rooms, floor, totfloors, m2, kitchenm2, restm2, price, city, district, street, updated, location, wc, walls, ceilings, rennovation, builtdate, heating, balcony, water, security, postDate)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, POINT(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, 
+                (guid, 
+                item['url'], 
+                item['description'], 
+                item['rooms'], 
+                item['floor'], 
+                item.get('totfloors',None), 
+                item['m2'], 
+                item.get('kitchenm2',None), 
+                item.get('restm2',None),
+                item['price'],
+                item.get('city',None), 
+                item.get('district',None), 
+                item['street'], 
+                item['updated'], 
+                item.get('lon',None),
+                item.get('lat',None),
+                
+                item.get('wc',None),
+                item.get('walls',None),
+                item.get('ceilings',None),
+                item.get('rennovation',None),
+                item.get('builtDate',None),
+                item.get('heating',None),
+                item.get('balcony',None),
+                item.get('water',None),
+                item.get('security',None),
+                
+                item.get('postDate',None),
+                ))
 
             print("Item stored in db: %s" % (guid))
 
