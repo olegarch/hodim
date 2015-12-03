@@ -13,7 +13,8 @@ def containingClass(className):
 class IrrSpider(scrapy.Spider):
     name = "irr"
     allowed_domains = ["irr.ru"]
-    start_urls = [ "http://rostovnadonu.irr.ru/real-estate/apartments-sale/" ]
+    #start_urls = [ "http://rostovnadonu.irr.ru/real-estate/apartments-sale/" ]
+    start_urls = [ "http://rostovnadonu.irr.ru/real-estate/apartments-sale/search/page_len60/" ]
     custom_settings = {
         'COOKIES_ENABLED': True
     }    
@@ -71,4 +72,5 @@ class IrrSpider(scrapy.Spider):
         l.add_xpath('walls', self.extract_property_string(u"Материал стен:"))
         l.add_xpath('ceilings', self.extract_property_string(u"Высота потолков:"))
         l.add_xpath('balcony', self.extract_property_string(u"Балкон"))
+        l.add_xpath('security', self.extract_property_string(u"Охрана"))
         yield l.load_item()
