@@ -10,6 +10,14 @@ from scrapy.loader import ItemLoader
 from scrapy.loader.processors import TakeFirst, MapCompose, Join
 from decimal import Decimal
 from re import findall, sub
+import dateparser
+
+def extract_date(value):
+    value = sub('[\n]', '', value).strip()
+    #print "POSTDATE",type(value),value.encode('utf-8')
+    d = dateparser.parse(value)
+    #print "POSTDATE",d
+    return d
 
 def extract_price(value):
     #print 'extract_price',type(value),value.encode('utf-8')
@@ -80,3 +88,5 @@ class ApartmentLoader(ItemLoader):
         
     ceilings_in = MapCompose(extract_decimal)
     builtDate_in = MapCompose(extract_int)
+    
+    postDate_in = MapCompose(extract_date)
