@@ -66,8 +66,9 @@ COOKIES_ENABLED=False
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    #'avito.pipelines.SomePipeline': 300,
-    'avito.pipelines.GeoPipeline': 301,
+    'avito.pipelines.DuplicatesPipeline': 300,
+    #'avito.pipelines.SomePipeline': 301,
+    'avito.pipelines.GeoPipeline': 302,
     'avito.pipelines.PrintPipeline': 997,
     'avito.pipelines.MySQLStorePipeline': 998,
     #'avito.pipelines.JsonWriterPipeline': 999
@@ -92,7 +93,7 @@ AUTOTHROTTLE_DEBUG=True
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-DEPTH_LIMIT = 1
+DEPTH_LIMIT = 2
 
 DUPEFILTER_DEBUG = True
 
