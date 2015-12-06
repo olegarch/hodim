@@ -53,6 +53,8 @@ class IrrSpider(scrapy.Spider):
         l.add_xpath('price', '//div[contains(@class,"productPagePrice")]/text()')
         #l.add_value('city', u'Ростов-на-Дону')
         l.add_value('updated', datetime.utcnow().isoformat())
+        l.add_xpath('postDate', '//div[@class="advertHeader"]/div[@class="createDate"]/text()')
+        l.add_xpath('postDate', '//div[@class="productPage_headerColumn"]/div[@class="productPage__createDate"]/text()')
 
         # properties
         l.add_xpath('m2', self.extract_property_string(u"Общая площадь:"))
