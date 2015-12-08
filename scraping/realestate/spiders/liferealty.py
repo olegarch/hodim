@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 
 import scrapy
-from avito.items import Apartment
+from realestate.items import Apartment
 import re
 from datetime import datetime
 from decimal import *

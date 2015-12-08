@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 
 import scrapy
-from avito.items import Apartment, ApartmentLoader
+from realestate.items import Apartment, ApartmentLoader
 import re
 from datetime import datetime
 from decimal import *
@@ -39,7 +39,7 @@ class IrrSpider(scrapy.Spider):
             
     def parse_item_page(self, response):
 
-        filename = response.url[-10:] + '.html'
+        filename = 'irr' + response.url[-10:] + '.html'
         self.logger.info('filename %s',filename)
         with open(filename, 'wb') as f:
             f.write(response.body)

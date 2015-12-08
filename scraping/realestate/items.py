@@ -14,9 +14,10 @@ import dateparser
 
 def extract_date(value):
     value = sub('[\n]', '', value).strip()
-    #print "POSTDATE",type(value),value.encode('utf-8')
+    value = sub(u'Размещено', '', value).strip()
+    print "POSTDATE",type(value),value.encode('utf-8')
     d = dateparser.parse(value)
-    #print "POSTDATE",d
+    print "POSTDATE",d
     return d
 
 def extract_price(value):
@@ -24,13 +25,27 @@ def extract_price(value):
     return ''.join(findall('\d+',value))
     
 def extract_decimal(value):
-    s = findall(r"\d*\.\d+|\d+",value)[0]
-    #print 'extract_decimal',type(value),value.encode('utf-8'),s
-    return Decimal(s)
+    matches = findall(r"\d*\.\d+|\d+",value)
+    if len(matches)>0:
+        #print 'extract_decimal',type(value),value.encode('utf-8'),s
+        return Decimal(matches[0])
+    else:
+        return None
 
+def extract_rooms(value):
+    if u'студия' in value.lower() or u'гостиника' in value.lower():
+        return 0
+    return value
+    
 def extract_int(value):
-    s = findall(r"\d+",value)[0]
-    #print 'extract_int',type(value),value.encode('utf-8'),s
+    #print 'extract_int type:%s value:"%s"' % (type(value),value.encode('utf-8'))
+    if isinstance(value, basestring):
+        s = findall(r"\d+",value)[0]
+    elif isinstance(value, int):
+        s = value
+    else:
+        raise 
+    #print "value int: %d" % (int(s),)
     return int(s)
     
 def remove_lines(value):
@@ -78,7 +93,7 @@ class ApartmentLoader(ItemLoader):
 
     floor_in = MapCompose(extract_int)
     totfloors_in = MapCompose(extract_int)
-    rooms_in = MapCompose(extract_int)
+    rooms_in = MapCompose(extract_rooms, extract_int)
     
     m2_in = MapCompose(extract_decimal)
     restm2_in = MapCompose(extract_decimal)

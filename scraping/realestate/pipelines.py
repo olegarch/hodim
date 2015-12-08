@@ -32,7 +32,7 @@ class PrintPipeline(object):
         spider.logger.debug("==== PrintPipeline ====")
         return item
 
-class DuplicatesPipeline(object):
+class FilterPipeline(object):
     def __init__(self, dbpool):
         self.dbpool = dbpool
 
@@ -50,6 +50,11 @@ class DuplicatesPipeline(object):
         return cls(dbpool)
         
     def process_item(self, item, spider):
+        
+        price = item.get('price',None)
+        if price is None:
+            raise DropItem("No price: %s" % item['url'])
+        
         # run db query in the thread pool
         d = self.dbpool.runInteraction(self._detect_dup, item, spider)
         d.addErrback(self._handle_error, item, spider)

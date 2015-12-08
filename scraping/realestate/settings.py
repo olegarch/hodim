@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for avito project
+# Scrapy settings for realestate project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,13 +9,13 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'avito'
+BOT_NAME = 'realestate'
 
 #LOG_FILE = 'scrapy.log'
 LOG_STDOUT = True
 
-SPIDER_MODULES = ['avito.spiders']
-NEWSPIDER_MODULE = 'avito.spiders'
+SPIDER_MODULES = ['realestate.spiders']
+NEWSPIDER_MODULE = 'realestate.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36'
@@ -48,13 +48,13 @@ COOKIES_ENABLED=False
 # Enable or disable spider middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'avito.middlewares.MyCustomSpiderMiddleware': 543,
+#    'realestate.middlewares.MyCustomSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'avito.middlewares.MyCustomDownloaderMiddleware': 543,
+#    'realestate.middlewares.MyCustomDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -66,12 +66,12 @@ COOKIES_ENABLED=False
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'avito.pipelines.DuplicatesPipeline': 300,
-    #'avito.pipelines.SomePipeline': 301,
-    'avito.pipelines.GeoPipeline': 302,
-    'avito.pipelines.PrintPipeline': 997,
-    'avito.pipelines.MySQLStorePipeline': 998,
-    #'avito.pipelines.JsonWriterPipeline': 999
+    'realestate.pipelines.FilterPipeline': 300,
+    #'realestate.pipelines.SomePipeline': 301,
+    'realestate.pipelines.GeoPipeline': 302,
+    'realestate.pipelines.PrintPipeline': 997,
+    'realestate.pipelines.MySQLStorePipeline': 998,
+    #'realestate.pipelines.JsonWriterPipeline': 999
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -93,7 +93,7 @@ AUTOTHROTTLE_DEBUG=True
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-DEPTH_LIMIT = 2
+DEPTH_LIMIT = 1
 
 DUPEFILTER_DEBUG = True
 
