@@ -46,7 +46,7 @@ class AvitoSpider(scrapy.Spider):
         #l.add_xpath('description', '//h1[@itemprop="name" and @class="h1"]/text()', re=u'(?:(\d+)-к квартира|(Студия))')
         l.add_xpath('rooms', '//h1[@itemprop="name" and @class="h1"]/text()', re=u'(Студия)')
         l.add_xpath('rooms', '//h1[@itemprop="name" and @class="h1"]/text()', re=u'(?:(\d+)-к квартира)')
-        l.add_xpath('m2', '//h1[@itemprop="name" and @class="h1"]/text()', re=u',\s+(\d+)\s+м²,')
+        l.add_xpath('m2', '//h1[@itemprop="name" and @class="h1"]/text()', re=u',\s+(\d*\.\d+|\d+)\s+м²,')
         l.add_xpath('floor', '//h1[@itemprop="name" and @class="h1"]/text()', re=u'\s+(\d+)/\d+\s+эт')
         l.add_xpath('totfloors', '//h1[@itemprop="name" and @class="h1"]/text()', re=u'\s+\d+/(\d+)\s+эт')
         l.add_xpath('price', '//span[@itemprop="price"]/text()')
@@ -62,4 +62,5 @@ class AvitoSpider(scrapy.Spider):
         
         l.add_value('updated', datetime.utcnow().isoformat())
         l.add_xpath('postDate', '//div[@class="item-subtitle"]/text()')
+        l.add_xpath('postDate', '//div[contains(@class,"item-subtitle")]/text()')
         yield l.load_item()
