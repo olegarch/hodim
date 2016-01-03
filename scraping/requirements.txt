@@ -1,0 +1,4 @@
+Scrapy
+dateparser
+geopy
+MySQLdb
