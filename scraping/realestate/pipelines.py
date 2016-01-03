@@ -92,7 +92,7 @@ class FilterPipeline(object):
 class GeoPipeline(object):
     def __init__(self):
         #self.geolocator = geopy.geocoders.Nominatim()
-        self.geolocator = geopy.geocoders.Yandex(timeout=5)
+        self.geolocator = geopy.geocoders.Yandex(timeout=10)
         
     def geocode(self, item, logger): 
         #fulladdr = ','.join((item['street'], item.get('district',''), item.get('city','')))
@@ -218,7 +218,7 @@ class MySQLStorePipeline(object):
                 item.get('water',None),
                 item.get('security',None),
                 
-                item.get('postDate',None),
+                item['postDate'],
                 ))
 
             print("Item stored in db: %s" % (guid))
