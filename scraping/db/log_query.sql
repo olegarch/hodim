@@ -1,0 +1,1 @@
+select event_time, CONVERT(argument using utf8) from mysql.general_log
