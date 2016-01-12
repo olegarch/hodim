@@ -33,7 +33,7 @@ def extract_decimal(value):
         return None
 
 def extract_rooms(value):
-    if u'студия' in value.lower() or u'гостиника' in value.lower():
+    if isinstance(value, basestring) and (u'студия' in value.lower() or u'гостиника' in value.lower()):
         return 0
     return value
     
