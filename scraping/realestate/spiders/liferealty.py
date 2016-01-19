@@ -28,9 +28,9 @@ class LiferealtySpider(scrapy.Spider):
         yield scrapy.Request(nexturl, callback=self.parse)
         
     def parse_item_page(self, response):
-        filename = 'liferealty' + response.url[-10:].strip('/') + '.html'
-        with open(filename, 'wb') as f:
-            f.write(response.body)
+        #filename = 'liferealty' + response.url[-10:].strip('/') + '.html'
+        #with open(filename, 'wb') as f:
+        #    f.write(response.body)
 
         l = ApartmentLoader(Apartment(), response)
         l.add_value('url', response.url)

@@ -26,10 +26,10 @@ class AvitoSpider(scrapy.Spider):
         yield scrapy.Request(next_url, callback=self.parse)
         
     def parse_item_page(self, response):
-        filename = 'avito' + response.url[-10:] + '.html'
+        #filename = 'avito' + response.url[-10:] + '.html'
         #self.logger.info('filename %s',filename)
-        with open(filename, 'wb') as f:
-            f.write(response.body)
+        #with open(filename, 'wb') as f:
+        #    f.write(response.body)
             
         l = ApartmentLoader(Apartment(), response)
         l.add_value('url', response.url)

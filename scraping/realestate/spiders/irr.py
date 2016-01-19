@@ -39,10 +39,10 @@ class IrrSpider(scrapy.Spider):
             
     def parse_item_page(self, response):
 
-        filename = 'irr' + response.url[-10:] + '.html'
-        self.logger.info('filename %s',filename)
-        with open(filename, 'wb') as f:
-            f.write(response.body)
+        #filename = 'irr' + response.url[-10:] + '.html'
+        #self.logger.info('filename %s',filename)
+        #with open(filename, 'wb') as f:
+        #    f.write(response.body)
     
         l = ApartmentLoader(Apartment(), response)
         l.add_value('url', response.url)
