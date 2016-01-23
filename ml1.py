@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 import sys
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import linear_model
@@ -106,34 +107,43 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     return plt
     
 def main():
-
+    pd.set_option('display.encoding','utf-8')
+    
     assert len(sys.argv) == 2
     filename = sys.argv[1]
+    df = pd.read_csv(filename,encoding='utf-8',index_col=0)
+    print 'Data shape', df.shape
 
-    f = open(filename)
-    titles = f.readline().strip('\n').split(',')  # skip the header
+    ##f = open(filename)
+    ##titles = f.readline().strip('\n').split(',')  # skip the header
     # rooms,floor,totfloors,m2,price,lon,lat
     #data = np.loadtxt(f, delimiter=',', dtype = {'names' : titles, 'formats':['u8','u8','u8','f2','u4','S32','S32']})
 
     #data = np.loadtxt(f, delimiter=',', usecols=(0,1,2,3,4,5,6))
-    data = np.loadtxt(f, delimiter=',', usecols=(0,1,2,3,4))
+    ##data = np.loadtxt(f, delimiter=',', usecols=(0,1,2,3,4))
     #data = data[:10,:]
-    print data
-    print data.shape
+
+    
+    data = df[['rooms','floor','totfloors','m2','lat','lon','price']]
+    #print data
+    print 'Total',data.shape
+    print '...contains NaN',data[data.isnull().any(axis=1)].shape
+    data = data.dropna()
+    print data.columns
+    titles = data.columns
 
     #data = data[data[:,3].argsort()]
     titles = titles[:-1]
-    X = data[:,:-1]
-    print X
+    y,X = data['price'],data[['rooms','floor','totfloors','m2','lat','lon']] #X = data[:,:-1]
+    #print X
     print X.shape
     #exit(0)
-    y = data[:,-1]
+    #y = data[:,-1]
     X = preprocessing.scale(X)
+
     
-    #regr_2 = AdaBoostRegressor(DecisionTreeRegressor(max_depth=4),
-    #                          n_estimators=300, random_state=rng)
-    rng = np.random.RandomState(45)
-    #rng = np.random.RandomState()
+    #rng = np.random.RandomState(45)
+    rng = np.random.RandomState()
 
     regressions = [
         #("GaussianProcess(regr='constant',corr='cubic')",gaussian_process.GaussianProcess(regr='constant',corr='cubic', theta0=1e-2, thetaL=1e-4, thetaU=1e-1,random_start=100)),
@@ -151,11 +161,11 @@ def main():
         #("NuSVR",svm.NuSVR()),
         #("GradientBoostingRegressor",ensemble.GradientBoostingRegressor()),
         #("KNeighborsRegressor(k=2,weights='uniform')", neighbors.KNeighborsRegressor(n_neighbors=2, weights='uniform')),
-        ("KNeighborsRegressor(k=5,weights='uniform')", neighbors.KNeighborsRegressor(n_neighbors=5, weights='uniform')),
+        #("KNeighborsRegressor(k=5,weights='uniform')", neighbors.KNeighborsRegressor(n_neighbors=5, weights='uniform')),
         #("KNeighborsRegressor(k=10,weights='uniform')", neighbors.KNeighborsRegressor(n_neighbors=10, weights='uniform')),
         #("KNeighborsRegressor(k=5,weights='distance')", neighbors.KNeighborsRegressor(n_neighbors=5, weights='distance')),
         #("Tree", tree.DecisionTreeRegressor()),
-        #("RFTree", ensemble.RandomForestRegressor(n_estimators=100, random_state=rng)),
+        ("RFTree", ensemble.RandomForestRegressor(n_estimators=100, random_state=rng)),
         #("AdaBoostTree", ensemble.AdaBoostRegressor(tree.DecisionTreeRegressor(), n_estimators=300, random_state=rng)),
         #("OLS", linear_model.LinearRegression()),
         #("Ridge99", linear_model.Ridge(alpha=.99)),
@@ -173,10 +183,10 @@ def main():
     for name, model_raw in regressions:
         cv = ShuffleSplit(X.shape[0], n_iter=3, test_size=0.2, random_state=rng)
         model = model_raw #make_pipeline(preprocessing.StandardScaler(), model_raw)
-        plot_validation_curve(model, name, X, y, cv=3, n_jobs=8, param_name="n_neighbors", param_range=np.linspace(1, 11, 10, dtype='i4'))
+        #plot_validation_curve(model, name, X, y, cv=3, n_jobs=1, param_name="n_neighbors", param_range=np.linspace(1, 11, 10, dtype='i4'))
+        plot_validation_curve(model, name, X, y, cv=3, n_jobs=8, param_name="n_estimators", param_range=np.linspace(1, 110, 10, dtype='i4'))
 
     plt.show()
-    exit(0)
 
     
     for name, model_raw in regressions:
@@ -190,7 +200,6 @@ def main():
         
         
     plt.show()
-    exit(0)
 
     plt.figure()
     plt.scatter(X_test[:,-1], y_test,  color='black')
