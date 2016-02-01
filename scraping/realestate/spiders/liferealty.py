@@ -15,9 +15,9 @@ class LiferealtySpider(scrapy.Spider):
     )
 
     def parse(self, response):
-        filename = 'liferealty' + '.html'
-        with open(filename, 'wb') as f:
-            f.write(response.body)
+        #filename = 'liferealty' + '.html'
+        #with open(filename, 'wb') as f:
+        #    f.write(response.body)
 
         for href in response.xpath('//table[@class="list townlist"]//tr[@offerid and not(@over50)]/@offerhref').extract():
             url = response.urljoin(href)
@@ -78,7 +78,13 @@ class LiferealtySpider(scrapy.Spider):
         l.add_xpath('postDate',u'//div[@id="list_sale"]//div[@class="card_date" and contains(.,"добавлено")]/descendant-or-self::*/text()',re=u'добавлено\s+(.*)')
         
         price = ''.join(response.xpath(u'//div[@id="list_sale"]//div[@class="card_price" and contains(.,"руб")]/text()').extract())
-        price = str(int(''.join(re.findall('\d+',price)))*1000)
+        self.logger.debug("1. price "+str(price))
+        price = ''.join(price)
+        self.logger.debug("2. price "+price)
+        price = price.replace(',','.')
+        self.logger.debug("3. price "+price)
+        price = str(int(float(price)*1000))
+        self.logger.debug("4. price "+price)
         l.add_value('price',price)
         
         yield l.load_item()
